@@ -110,7 +110,9 @@ i_s = 7
 d_time = 12         # (hours)
 theta = 0
 dt = ( 2* np.pi )/ (8760 / d_time)
-dt_ss = 0.5
+ds_time = 525600
+dt_ss = ( 2* np.pi )/ (105120 / ds_time)
+
 theta_ss = 0
 
 
