@@ -74,7 +74,6 @@ if (limit>39.6):
     ax.add_patch(circ_Pluto)
 
 
-
 # Create patches for the solar sail
 #circ_small = plt.Circle((0, 0), 0.1, color='r', fill=True)
 #ax.add_patch(circ_small)
@@ -92,10 +91,10 @@ spacing3 = spacing2/2
 spacing4 = 0.6 * limit
 
 # Parameter initialization
-x_earth = 0               # (units)
-y_earth = 0               # (units)
-x_ss = 0
-y_ss = 0
+x_earth = 0         # (units)
+y_earth = 0         # (units)
+x_ss = 0            # (units)
+y_ss = 0            # (units)
 speed = 0           # (units)
 accel = 0           # (units)
 force = 0           # (units)
@@ -107,7 +106,15 @@ area = 32           # (m^2)
 mass = 5            # (kg)
 i_s = 7
 
-time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=1, weeks=0)
+# Initialize variables for animation
+d_time = 12         # (hours)
+theta = 0
+dt = ( 2* np.pi )/ (8760 / d_time)
+dt_ss = 0.5
+theta_ss = 0
+
+
+time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=d_time, weeks=0)
 time = datetime(1,1,1,0,0,0)
 
 # Text initialization
@@ -127,11 +134,7 @@ dists_t = plt.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Distanc
 
 time_t = plt.text(limit - spacing4, -spacing3-limit + spacing2 * i_s, 'Elapsed time: {0}y {1}m {2}d {3}h '.format(time.year-1, time.month-1, time.day-1, time.hour-1 ), fontsize=10, color = 'g')
 
-# Initialize variables for animation
-theta = 0
-dt = 0.1
-dt_ss = 0.5
-theta_ss = 0
+
 
 # To maintain an orbit that is 22,223 miles (35,786 km) above Earth, the satellite must orbit at a speed of about 7,000 mph (11,300 kph).
 
@@ -154,11 +157,12 @@ def update_anim(num):
     global theta, theta_ss, time, time_delta
 
     # Update the position of the smaller circle
-    x_earth, y_earth = planet_Earth.center
     planet_Earth.center = update_earth()
+    x_earth, y_earth = planet_Earth.center
 
-    x_ss, y_ss = solar_sail.center
     solar_sail.center = update_ss(x_earth, y_earth)
+    x_ss, y_ss = solar_sail.center
+    
 
     # pos_t.set_text('Position: ('+str(x)+', '+str(y)+')')
     posit_t.set_text('Position: {0:.2f}, {1:.2f} '.format(x_ss, y_ss))
