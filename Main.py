@@ -106,17 +106,7 @@ area = 32           # (m^2)
 mass = 5            # (kg)
 i_s = 7
 
-# Initialize variables for animation
-d_time = 12         # (hours)
-theta = 0
-dt = ( 2* np.pi )/ (8760 / d_time)
-ds_time = 525600
-dt_ss = ( 2* np.pi )/ (105120 / ds_time)
-
-theta_ss = 0
-
-
-time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=d_time, weeks=0)
+time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=1, weeks=0)
 time = datetime(1,1,1,0,0,0)
 
 # Text initialization
