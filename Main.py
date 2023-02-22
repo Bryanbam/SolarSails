@@ -106,7 +106,20 @@ area = 32           # (m^2)
 mass = 5            # (kg)
 i_s = 7
 
-time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=1, weeks=0)
+# Initialize variables for animation
+radius = 15000 #(km)
+# speed = 11300 #  (kmph)
+d_time = 0.1 # (hours)
+speed = radius*2*np.pi/12 #  (kmph)        
+theta = 0
+dt = ( 2* np.pi )/ (8760 / d_time)
+#dt_ss = ( 2* np.pi )/ (12 / d_time)
+dt_ss = d_time * speed/radius
+
+theta_ss = 0
+
+
+time_delta = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=d_time, weeks=0)
 time = datetime(1,1,1,0,0,0)
 
 # Text initialization
