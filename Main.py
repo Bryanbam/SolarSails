@@ -103,7 +103,7 @@ dist_earth = 0      # (units)
 dist_sun = 0        # (units)
 boom = 4            # (m)
 area = 32           # (m^2)
-mass = 5            # (kg)
+mass = 5            # (kg) Taken from Planetary Society
 i_s = 7
 
 # Initialize variables for animation
@@ -152,8 +152,21 @@ def update_earth():
 
 def update_ss(x_o,y_o):
     global theta_ss
-    # x_ss, y_ss = x_o + earth_size + limit/12, y_o + earth_size + limit/12
+    gravity = 9.8 #m/s^2
+    fg = mass*gravity
+    fc = mass*speed/radius
+    refl = 1
     ss_orbit = earth_size + limit / 12
+    pressure = 4.56*10**(-6)*(1+refl) / ss_orbit**2
+    fs = pressure*area
+
+    
+    
+    
+    
+
+    # x_ss, y_ss = x_o + earth_size + limit/12, y_o + earth_size + limit/12
+    
     x_ss, y_ss = x_o + ss_orbit * np.cos(theta_ss), y_o + ss_orbit * np.sin(theta_ss)
     return x_ss, y_ss
 
