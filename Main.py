@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from datetime import datetime
 from datetime import timedelta
+from mpl_interactions import ioff, panhandler, zoom_factory
+
 #  
 # Create figure and axes
 fig, ax = plt.subplots(figsize=(9, 9))
@@ -26,6 +28,7 @@ limit = 1.5
 
 ax.set_xlim(-limit, limit)
 ax.set_ylim(-limit, limit)
+disconnect_zoom = zoom_factory(ax)
 
 # Set up plot titles and labels
 plt.title("Solar Sail Simulation")
@@ -91,28 +94,30 @@ spacing3 = spacing2/2
 spacing4 = 0.6 * limit
 
 # Parameter initialization
-x_earth = 0         # (units)
-y_earth = 0         # (units)
-x_ss = 0            # (units)
-y_ss = 0            # (units)
-speed = 0           # (units)
-accel = 0           # (units)
-force = 0           # (units)
-orient = 0          # (units)
-dist_earth = 0      # (units)
-dist_sun = 0        # (units)
-boom = 4            # (m)
-area = 32           # (m^2)
-mass = 5            # (kg) Taken from Planetary Society
+x_earth = 0                     # (units)
+y_earth = 0                     # (units)
+x_ss = 0                        # (units)
+y_ss = 0                        # (units)
+speed = 0                       # (units)
+accel = 0                       # (units)
+force = 0                       # (units)
+orient = 0                      # (units)
+dist_earth = 0                  # (units)
+dist_sun = 0                    # (units)
+boom = 4                        # (m)
+area = 32                       # (m^2)
+mass = 5                        # (kg) Taken from Planetary Society
 i_s = 7
 
 # Initialize variables for animation
-radius = 15000 #(km)
-# speed = 11300 #  (kmph)
+radius = 15000                  # (km)
+# speed = 11300                 # (kmph)
 d_time = 0.1 # (hours)
 speed = radius*2*np.pi/12 #  (kmph)        
 theta = 0
 dt = ( 2* np.pi )/ (8760 / d_time)
+
+ss_orbit = earth_size + limit / 12
 #dt_ss = ( 2* np.pi )/ (12 / d_time)
 dt_ss = d_time * speed/radius
 
@@ -152,11 +157,11 @@ def update_earth():
 
 def update_ss(x_o,y_o):
     global theta_ss
-    gravity = 9.8 #m/s^2
+    gravity = 9.8               # (m/s^2)
     fg = mass*gravity
     fc = mass*speed/radius
     refl = 1
-    ss_orbit = earth_size + limit / 12
+    
     pressure = 4.56*10**(-6)*(1+refl) / ss_orbit**2
     fs = pressure*area
 
