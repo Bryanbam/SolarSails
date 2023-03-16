@@ -5,19 +5,15 @@ from matplotlib.animation import FuncAnimation
 from datetime import datetime
 from datetime import timedelta
 from mpl_interactions import ioff, panhandler, zoom_factory
-import logging
 
 # Log initialization
-# logging.basicConfig(filename='SS_Log.log', filemode='w')
-# ss_log=logging.getLogger() 
-# ss_log.info("Time(sec)\tDistE(AU)\tForce\tSpeed")
 ss_log = open("SS_log.txt", "w")
 ss_log.write("Time(min)\tDistE(AU)\tForce\tSpeed\n")
 
 
 # Units (mks)
 limit = 45                                  # (AU) Max simulation limit
-d_time = 10 #360*100                            # (seconds)
+d_time = 360*100                            # (seconds)
 
 # Parameter initialization
 gconst = 6.673e-11
