@@ -5,6 +5,7 @@ from matplotlib.animation import FuncAnimation
 from datetime import datetime
 from datetime import timedelta
 from mpl_interactions import ioff, panhandler, zoom_factory
+from time import sleep
 
 # Log initialization
 ss_log = open("SS_log.txt", "w")
@@ -13,7 +14,8 @@ ss_log.write("Time(min)\tDistE(AU)\tForce\tSpeed\n")
 
 # Units (mks)
 limit = 45                                  # (AU) Max simulation limit
-d_time = 360*100                            # (seconds)
+d_time =  7200#360*100                            # (seconds)
+time_limit = 129600 # (minutes)
 
 # Parameter initialization
 gconst = 6.673e-11
@@ -55,8 +57,8 @@ ss_dist_earth = 0                           # (AU) From center
 ss_dist_sun = 0                             # (AU) From center
 ss_boom = 4                                 # (m)
 ss_sail = 3                                 # scale 
-ss_area = 600                                # (m^2)
-ss_mass = 5                                 # (kg) Taken from Planetary Society
+ss_area = 600                                # (m^2) 300 600 1200 3000 6000
+ss_mass = 500                                 # (kg) Taken from Planetary Society
 ss_refl = 1                                 # 
 # a_alpha = 0                               # (degrees) 
 # a_beta = 0                                # (degrees) 
@@ -111,45 +113,46 @@ plt.title("Solar Sail Simulation")
 plt.xlabel("Distance (Astronomical Units)")
 plt.ylabel("Distance (Astronomical Units)")
 
+orbits_c='c'
 # Create circle patch for the planets orbits & sun
 if (limit>0.00465047):
     circ_Sun = plt.Circle((0, 0), 0.00465047, color='y', fill=True)
     ax.add_patch(circ_Sun)
 
 if (limit>0.4475):
-    circ_Mercury = plt.Circle((0, 0), 0.4475, color='b', fill=False)
+    circ_Mercury = plt.Circle((0, 0), 0.4475, color=orbits_c, fill=False)
     ax.add_patch(circ_Mercury)
 
 if (limit>0.0723):
-    circ_Venus = plt.Circle((0, 0), 0.723, color='b', fill=False)
+    circ_Venus = plt.Circle((0, 0), 0.723, color=orbits_c, fill=False)
     ax.add_patch(circ_Venus)
 
 if (limit>1):
-    circ_Earth = plt.Circle((0, 0), 1, color='b', fill=False)
+    circ_Earth = plt.Circle((0, 0), 1, color=orbits_c, fill=False)
     ax.add_patch(circ_Earth)
 
 if (limit>1.524):
-    circ_Mars = plt.Circle((0, 0), 1.524, color='b', fill=False)
+    circ_Mars = plt.Circle((0, 0), 1.524, color=orbits_c, fill=False)
     ax.add_patch(circ_Mars)
 
 if (limit>5.204):
-    circ_Jupiter = plt.Circle((0, 0), 5.204, color='b', fill=False)
+    circ_Jupiter = plt.Circle((0, 0), 5.204, color=orbits_c, fill=False)
     ax.add_patch(circ_Jupiter)
 
 if (limit>9.5725):
-    circ_Saturn = plt.Circle((0, 0), 9.5725, color='b', fill=False)
+    circ_Saturn = plt.Circle((0, 0), 9.5725, color=orbits_c, fill=False)
     ax.add_patch(circ_Saturn)
 
 if (limit >19.165):
-    circ_Uranus = plt.Circle((0, 0), 19.165, color='b', fill=False)
+    circ_Uranus = plt.Circle((0, 0), 19.165, color=orbits_c, fill=False)
     ax.add_patch(circ_Uranus)
 
 if (limit >30.18):
-    circ_Neptune = plt.Circle((0, 0), 30.18, color='b', fill=False)
+    circ_Neptune = plt.Circle((0, 0), 30.18, color=orbits_c, fill=False)
     ax.add_patch(circ_Neptune)
 
 if (limit>39.6):
-    circ_Pluto = plt.Circle((0, 0), 39.6, color='b', fill=False)
+    circ_Pluto = plt.Circle((0, 0), 39.6, color=orbits_c, fill=False)
     ax.add_patch(circ_Pluto)
 
 
@@ -375,8 +378,12 @@ def update_anim(num):
     # Update Log
     # ss_log.info('{0}\t{1}\t{2}\t{3}'.format(time.time(), ss_dist_earth-earth_radius, np.linalg.norm(ss_force), np.linalg.norm(ss_velocity)))
     # np.savez('SS_Log', ss_t = time.time(), ss_d = ss_dist_earth-earth_radius, ss_f = np.linalg.norm(ss_force), ss_v = np.linalg.norm(ss_velocity))
-    time_min = (time.year-1)*525600+(time.month-1)*43800+(time.day-1)*1440+time.hour*60
-    ss_log.write('{0}\t{1}\t{2}\t{3}\n'.format(time_min, ss_dist_earth-earth_radius, np.linalg.norm(ss_force), np.linalg.norm(ss_velocity)))
+    # time_min = (time.year-1)*525600+(time.month-1)*43800+(time.day-1)*1440+time.hour*60
+    time_min = (time.year-1)*525600+(time.month-1)*43800+(time.day-1)*1440+time.hour*60+time.minute
+    if time_min>time_limit:
+        sleep()
+    else:
+        ss_log.write('{0}\t{1}\t{2}\t{3}\n'.format(time_min, ss_dist_earth-earth_radius, np.linalg.norm(ss_force), np.linalg.norm(ss_velocity)))
         
     # Update angle
     theta += dt
