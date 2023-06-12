@@ -5,17 +5,21 @@ from matplotlib.animation import FuncAnimation
 from datetime import datetime
 from datetime import timedelta
 from mpl_interactions import ioff, panhandler, zoom_factory
-from time import sleep
 
 # Log initialization
 ss_log = open("SS_log.txt", "w")
 ss_log.write("Time(min)\tDistE(AU)\tForce\tSpeed\n")
 
+sail_active = 0                             # Enable solar sail
+auto_zoom = 1                               # Enable auto zoom
 
 # Units (mks)
 limit = 45                                  # (AU) Max simulation limit
-d_time =  7200#360*100                            # (seconds)
-time_limit = 129600 # (minutes)
+d_time = 60                                 # (seconds) (very slow)
+# d_time = 600                                # (seconds) (slow)
+# d_time = 360*100                            # (seconds) (mid)
+# d_time = 360*1000                           # (seconds) (fast)
+
 
 # Parameter initialization
 gconst = 6.673e-11
@@ -57,8 +61,8 @@ ss_dist_earth = 0                           # (AU) From center
 ss_dist_sun = 0                             # (AU) From center
 ss_boom = 4                                 # (m)
 ss_sail = 3                                 # scale 
-ss_area = 600                                # (m^2) 300 600 1200 3000 6000
-ss_mass = 500                                 # (kg) Taken from Planetary Society
+ss_area = 600                                # (m^2)
+ss_mass = 5                                 # (kg) Taken from Planetary Society
 ss_refl = 1                                 # 
 # a_alpha = 0                               # (degrees) 
 # a_beta = 0                                # (degrees) 
@@ -113,7 +117,9 @@ plt.title("Solar Sail Simulation")
 plt.xlabel("Distance (Astronomical Units)")
 plt.ylabel("Distance (Astronomical Units)")
 
-orbits_c='c'
+orbits_c = 'lightseagreen' # 'c'  turquoise
+text_c = 'greenyellow'
+
 # Create circle patch for the planets orbits & sun
 if (limit>0.00465047):
     circ_Sun = plt.Circle((0, 0), 0.00465047, color='y', fill=True)
@@ -165,10 +171,10 @@ ax.add_patch(solar_sail_c)
 ss_xl = np.array([-2*ss_size, 2*ss_size])
 ss_yl = np.array([-2*ss_size, 2*ss_size])
 solar_sail_l = plt.Line2D(ss_xl, ss_yl, color='gold')
-ax.add_patch(solar_sail_l)
+ax.add_line(solar_sail_l)
 
 solar_sail_t = plt.Line2D(ss_xx, ss_yy, color='gray')
-ax.add_patch(solar_sail_t)
+ax.add_line(solar_sail_t)
 
 spacing1 = 0.016 * limit
 spacing2 = 0.05 * limit
@@ -177,25 +183,25 @@ spacing4 = 0.6 * limit
 
 # Text initialization
 i_s = 8
-ss_force_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Force: {0:.5f}, {1:.5f}'.format(ss_force[0], ss_force[1]), fontsize=10, color = 'g')
+ss_force_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Force: {0:.5f}, {1:.5f}'.format(ss_force[0], ss_force[1]), fontsize=10, color = text_c)
 i_s -= 1
-speed_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Speed: {0:.5f} m/s'.format(np.linalg.norm(ss_velocity)), fontsize=10, color = 'g')
+speed_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Speed: {0:.5f} m/s'.format(np.linalg.norm(ss_velocity)), fontsize=10, color = text_c)
 i_s -= 1
-velocity_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Velocity: {0:.5f}, {1:.5f} m/s'.format(ss_velocity[0], ss_velocity[1]), fontsize=10, color = 'g')
+velocity_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Velocity: {0:.5f}, {1:.5f} m/s'.format(ss_velocity[0], ss_velocity[1]), fontsize=10, color = text_c)
 i_s -= 1
-ss_accel_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Acceleration: {0:.5f}, {1:.5f}'.format(ss_accel[0], ss_accel[1]), fontsize=10, color = 'g')
+ss_accel_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Acceleration: {0:.5f}, {1:.5f}'.format(ss_accel[0], ss_accel[1]), fontsize=10, color = text_c)
 i_s -= 1
-ss_press_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Pressure: {0:.5f}'.format(ss_pressure), fontsize=10, color = 'g')
+ss_press_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Pressure: {0:.5f}'.format(ss_pressure), fontsize=10, color = text_c)
 i_s -= 1
-orien_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Orientation: {0:.2f}'.format(ss_orient), fontsize=10, color = 'g')
+orien_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Orientation: {0:.2f}'.format(ss_orient), fontsize=10, color = text_c)
 i_s -= 1
-posit_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Position: {0:.2f}, {1:.2f} AU'.format(ss_x, ss_y), fontsize=10, color = 'g')
+posit_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Position: {0:.2f}, {1:.2f} AU'.format(ss_x, ss_y), fontsize=10, color = text_c)
 i_s -= 1
-distE_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Distance from Earth: {0:.2f} km'.format(ss_dist_earth/1000), fontsize=10, color = 'g')
+distE_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Distance from Earth: {0:.2f} km'.format(ss_dist_earth/1000), fontsize=10, color = text_c)
 i_s -= 1
-distS_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Distance from Sun: {0:.2f}'.format(ss_dist_sun), fontsize=10, color = 'g')
+distS_t = ax.text(-limit + spacing1, -spacing3-limit + spacing2 * i_s, 'Distance from Sun: {0:.2f}'.format(ss_dist_sun), fontsize=10, color = text_c)
 
-time_t = ax.text(limit - spacing4, -spacing3-limit + spacing2 * i_s, 'Elapsed time: {0}y {1}m {2}d {3}h '.format(time.year-1, time.month-1, time.day-1, time.hour-1 ), fontsize=10, color = 'g')
+time_t = ax.text(limit - spacing4, -spacing3-limit + spacing2 * i_s, 'Elapsed time: {0}y {1}m {2}d {3}h '.format(time.year-1, time.month-1, time.day-1, time.hour-1 ), fontsize=10, color = text_c)
 
 # To maintain an orbit that is 22,223 miles (35,786 km) above Earth, the satellite must orbit at a speed of about 7,000 mph (11,300 kph).
 
@@ -270,9 +276,13 @@ def update_ss(x_o, y_o):
         # print("Sail Velocity",ss_accel)
 
         # Calculate position
-        ss_x, ss_y = solar_sail_c.center + (ss_velocity*d_time + (ss_accel*d_time**2)/2)/au2m
+        if (sail_active == 1):
+            # Calculate new position using ss_velocity and acceleration
+            ss_x, ss_y = solar_sail_c.center + (ss_velocity*d_time + (ss_accel*d_time**2)/2)/au2m
+        else:
+            # Solar Sail orbits Earth
+            ss_x, ss_y = x_o + ss_orbit * np.cos(theta_ss), y_o + ss_orbit * np.sin(theta_ss)
         # ss_x, ss_y = ss_position
-        # ss_x, ss_y = x_o + ss_orbit * np.cos(theta_ss), y_o + ss_orbit * np.sin(theta_ss)
 
     ss_xx.append(ss_x)
     ss_yy.append(ss_y)
@@ -291,12 +301,6 @@ def update_anim(num):
     solar_sail_c.center = update_ss(earth_x, earth_y)
     ss_x, ss_y = solar_sail_c.center
 
-    # Update plot limits
-    # x0_lim = -limit
-    # x1_lim = +limit
-    # y0_lim = -limit
-    # y1_lim = +limit
-
     d_ss = math.dist(solar_sail_c.center, (ss_x_init, ss_y_init))
     d_e = math.dist(planet_Earth.center, (ss_x_init, ss_y_init))
 
@@ -304,11 +308,18 @@ def update_anim(num):
         v_dist=d_ss
     else:
         v_dist=d_e
-
-    x0_lim = ss_x_init-v_dist*1.2
-    x1_lim = ss_x_init+v_dist*1.2
-    y0_lim = ss_y_init-v_dist*1.2
-    y1_lim = ss_y_init+v_dist*1.2
+    
+    # Update plot limits
+    if (auto_zoom == 1):
+        x0_lim = ss_x_init-v_dist*1.2
+        x1_lim = ss_x_init+v_dist*1.2
+        y0_lim = ss_y_init-v_dist*1.2
+        y1_lim = ss_y_init+v_dist*1.2
+    else:
+        x0_lim = -limit
+        x1_lim = +limit
+        y0_lim = -limit
+        y1_lim = +limit
 
     limit_x = x1_lim - x0_lim
     limit_y = y1_lim - y0_lim
@@ -380,10 +391,7 @@ def update_anim(num):
     # np.savez('SS_Log', ss_t = time.time(), ss_d = ss_dist_earth-earth_radius, ss_f = np.linalg.norm(ss_force), ss_v = np.linalg.norm(ss_velocity))
     # time_min = (time.year-1)*525600+(time.month-1)*43800+(time.day-1)*1440+time.hour*60
     time_min = (time.year-1)*525600+(time.month-1)*43800+(time.day-1)*1440+time.hour*60+time.minute
-    if time_min>time_limit:
-        sleep()
-    else:
-        ss_log.write('{0}\t{1}\t{2}\t{3}\n'.format(time_min, ss_dist_earth-earth_radius, np.linalg.norm(ss_force), np.linalg.norm(ss_velocity)))
+    ss_log.write('{0}\t{1}\t{2}\t{3}\n'.format(time_min, ss_dist_earth-earth_radius, np.linalg.norm(ss_force), np.linalg.norm(ss_velocity)))
         
     # Update angle
     theta += dt
